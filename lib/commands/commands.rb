@@ -228,7 +228,7 @@ desc "Create a new GitHub repository from the current local repository"
 flags :private => 'Create private repository'
 command :'create-from-local' do
   cwd = sh "pwd"
-  repo = File.basename(cwd)
+  repo = File.basename(cwd, ".git")
   is_repo = !git("status").match(/fatal/)
   raise "Not a git repository. Use gh create instead" unless is_repo
   sh  "curl -F 'repository[name]=#{repo}' -F 'repository[public]=#{!options[:private].inspect} -F 'login=#{github_user}' -F 'token=#{github_token}' http://github.com/repositories"
