@@ -181,7 +181,7 @@ flags :rdoc => 'Create README.rdoc'
 flags :rst => 'Create README.rst'
 flags :private => 'Create private repository'
 command :create do |repo|
-  sh "curl -F 'repository[name]=#{repo}' -F 'repository[public]=#{!options[:private]}' -F 'login=#{github_user}' -F 'token=#{github_token}' http://github.com/repositories"
+  github_post "http://github.com/repositories", "repository[name]" => repo, "repository[public]" => !options[:private]
   mkdir repo
   cd repo
   git "init"
@@ -211,7 +211,7 @@ command :fork do |user, repo|
     end
   end
 
-  sh "curl -F 'login=#{github_user}' -F 'token=#{github_token}' http://github.com/#{user}/#{repo}/fork"
+  github_post "http://github.com/#{user}/#{repo}/fork"
 
   url = "git@github.com:#{github_user}/#{repo}.git"
   if is_repo
@@ -231,8 +231,7 @@ command :'create-from-local' do
   repo = File.basename(cwd, ".git")
   is_repo = !git("status").match(/fatal/)
   raise "Not a git repository. Use gh create instead" unless is_repo
-  opt_public = (!options[:private]).inspect
-  sh "curl -F 'repository[name]=#{repo}' -F 'repository[public]=#{opt_public}' -F 'login=#{github_user}' -F 'token=#{github_token}' http://github.com/repositories"
+  github_post "http://github.com/repositories", "repository[name]" => repo, "repository[public]" => !options[:private]
   git "remote add origin git@github.com:#{github_user}/#{repo}.git"
   git_exec "push origin master"
 end
