@@ -186,6 +186,7 @@ flags :rdoc => 'Create README.rdoc'
 flags :rst => 'Create README.rst'
 flags :private => 'Create private repository'
 command :create do |repo|
+  public_repo = options[:private].nil?
   github_post "http://github.com/repositories", "repository[name]" => repo, "repository[public]" => public_repo
   mkdir repo
   cd repo
