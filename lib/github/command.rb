@@ -77,7 +77,8 @@ module GitHub
 
     def github_post(url, hash={})
       hash = { "login" => github_user, "token" => github_token }.merge(hash)
-      sh "curl " + hash.entries.map { |k, v| '-F '+ shellescape("#{k}=#{v}") }.join(" ") + " #{shellescape(url)}"
+      entries = hash.entries.sort {|x,y| x.first <=> y.first}
+      sh "curl " + entries.map { |k, v| '-F '+ shellescape("#{k}=#{v}") }.join(" ") + " #{shellescape(url)}"
     end
 
     def shellescape(s)
