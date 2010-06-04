@@ -186,7 +186,8 @@ flags :rdoc => 'Create README.rdoc'
 flags :rst => 'Create README.rst'
 flags :private => 'Create private repository'
 command :create do |repo|
-  sh "curl -F 'repository[name]=#{repo}' -F 'repository[public]=#{!options[:private]}' -F 'login=#{github_user}' -F 'token=#{github_token}' http://github.com/repositories"
+  public_repo = options[:private].nil?
+  sh "curl -F 'repository[name]=#{repo}' -F 'repository[public]=#{public_repo.inspect}' -F 'login=#{github_user}' -F 'token=#{github_token}' http://github.com/repositories"
   mkdir repo
   cd repo
   git "init"
@@ -236,7 +237,8 @@ command :'create-from-local' do
   repo = File.basename(cwd)
   is_repo = !git("status").match(/fatal/)
   raise "Not a git repository. Use gh create instead" unless is_repo
-  created = sh  "curl -F 'repository[name]=#{repo}' -F 'repository[public]=#{!options[:private].inspect}' -F 'login=#{github_user}' -F 'token=#{github_token}' http://github.com/repositories"
+  public_repo = options[:private].nil?
+  created = sh  "curl -F 'repository[name]=#{repo}' -F 'repository[public]=#{public_repo.inspect}' -F 'login=#{github_user}' -F 'token=#{github_token}' http://github.com/repositories"
   if created.out =~ %r{You are being <a href="http://github.com/#{github_user}/([^"]+)"}
     git "remote add origin git@github.com:#{github_user}/#{$1}.git"
     git_exec "push origin master"
