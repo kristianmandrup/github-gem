@@ -1,3 +1,9 @@
+== 0.4.4 2010-06-05
+
+Fixed creation of public repositories
+
+Refactored curl commands into common helper [kch]
+
 == 0.4.3
 
 Updated command:
