@@ -186,8 +186,7 @@ flags :rdoc => 'Create README.rdoc'
 flags :rst => 'Create README.rst'
 flags :private => 'Create private repository'
 command :create do |repo|
-  public_repo = options[:private].nil?
-  sh "curl -F 'repository[name]=#{repo}' -F 'repository[public]=#{public_repo.inspect}' -F 'login=#{github_user}' -F 'token=#{github_token}' http://github.com/repositories"
+  github_post "http://github.com/repositories", "repository[name]" => repo, "repository[public]" => public_repo
   mkdir repo
   cd repo
   git "init"
@@ -217,7 +216,7 @@ command :fork do |user, repo|
     end
   end
 
-  sh "curl -F 'login=#{github_user}' -F 'token=#{github_token}' http://github.com/#{user}/#{repo}/fork"
+  github_post "http://github.com/#{user}/#{repo}/fork"
 
   url = "git@github.com:#{github_user}/#{repo}.git"
   if is_repo
@@ -234,18 +233,13 @@ desc "Create a new GitHub repository from the current local repository"
 flags :private => 'Create private repository'
 command :'create-from-local' do
   cwd = sh "pwd"
-  repo = File.basename(cwd)
+  repo = File.basename(cwd, ".git")
   is_repo = !git("status").match(/fatal/)
   raise "Not a git repository. Use gh create instead" unless is_repo
   public_repo = options[:private].nil?
-  created = sh  "curl -F 'repository[name]=#{repo}' -F 'repository[public]=#{public_repo.inspect}' -F 'login=#{github_user}' -F 'token=#{github_token}' http://github.com/repositories"
-  if created.out =~ %r{You are being <a href="http://github.com/#{github_user}/([^"]+)"}
-    git "remote add origin git@github.com:#{github_user}/#{$1}.git"
-    git_exec "push origin master"
-  else
-    #TODO try to explain why it failed
-    die "error creating repository"
-  end
+  github_post "http://github.com/repositories", "repository[name]" => repo, "repository[public]" => public_repo
+  git "remote add origin git@github.com:#{github_user}/#{repo}.git"
+  git_exec "push origin master"
 end
 
 desc "Search GitHub for the given repository name."

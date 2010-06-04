@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'shellwords'
 
 if RUBY_PLATFORM =~ /mswin|mingw/
   begin
@@ -72,6 +73,16 @@ module GitHub
 
     def github_token
       git("config --get github.token")
+    end
+
+    def github_post(url, hash={})
+      hash = { "login" => github_user, "token" => github_token }.merge(hash)
+      sh "curl " + hash.entries.map { |k, v| '-F '+ shellescape("#{k}=#{v}") }.join(" ") + " #{shellescape(url)}"
+    end
+
+    def shellescape(s)
+      # make ruby -v ≤ v1.8.6 happy
+      s.respond_to?(:shellescape) ? s.shellescape : "'#{s}'"
     end
 
     def shell_user
