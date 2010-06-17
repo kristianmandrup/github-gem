@@ -69,11 +69,11 @@ describe "github issues" do
   
   class CommandHelper::Runner
     def mock_issues_for(state = "open", options = {})
-      options[:updated_at] = 5.minutes.ago
-      options[:closed_at]  = 5.minutes.ago
-      options[:created_at] = 10.hours.ago
-      options[:user]       = "user"
-      options[:project]    = "project"
+      options[:updated_at]  = Time.now - (60 * 5)
+      options[:closed_at]   = Time.now - (60 * 5)
+      options[:created_at]  = Time.now - (10 * 60 * 60)      
+      options[:user]        = "user"
+      options[:project]     = "project"
       yaml = <<-YAML.gsub(/^    /, '')
       --- 
       issues: 
