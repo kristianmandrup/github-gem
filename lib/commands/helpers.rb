@@ -177,6 +177,8 @@ helper :truncate do |text, opt|
     l = opt[:length] - opt[:omission].length
     chars = text
     (chars.length > opt[:length] ? chars[0...l] + opt[:omission] : text).to_s
+  else
+    ""
   end
 end
 
@@ -190,10 +192,10 @@ helper :commit_line do |sha, ref_name, commit|
   }
 end
 
-helper :commit_entry |entry, opt|
+helper :commit_entry do |entry, opt|
   entry = entry[0, length] if opt[:length]
-  truncate(txt, :length => opt[:max_length]) if options[:short] && opt[:max_length]
-  txt.ljust opt[:ljust] if opt[:ljust]
+  entry = truncate(entry, :length => opt[:max_length]) if options[:short] && opt[:max_length]
+  entry.ljust opt[:ljust] if opt[:ljust]
 end
 
 helper :applies_cleanly do |sha|
