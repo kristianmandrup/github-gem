@@ -176,7 +176,7 @@ helper :print_commits do |our_commits, options|
   lines.each do |line|    
     parts = util.line_parts(lines, line)    
     # :sha, :branch, :email, :message, :time_ago    
-    out << "#{parts[:sha]} #{parts[:branch]} #{parts[:email]} #{parts[:message]} #{parts[:time_ago]}"  
+    out << "#{parts[:sha]} #{parts[:branch]}  #{parts[:email]}  #{parts[:message]} #{parts[:time_ago]}"  
   end    
   puts *out  
 end
