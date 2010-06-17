@@ -172,8 +172,11 @@ helper :print_commits do |our_commits, options|
   end                                                                
 end
 
-helper :truncate do |str, length|
-  str.gsub(/^(.{#{length}}[\w.]*)(.*)/m) {$2.empty? ? $1 : $1 + ‘…’}  
+helper :truncate do |text, length|
+  end_string = ' …'
+  return "" if text == nil
+  words = text.split()
+  words[0..(length-1)].join(' ') + (words.length > length ? end_string : '')
 end
 
 helper :commit_line do |sha, ref_name, commit|
