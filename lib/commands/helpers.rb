@@ -1,6 +1,9 @@
 DEV_NULL = File.exist?("/dev/null") ? "/dev/null" : "nul:" unless const_defined?("DEV_NULL")
 
-# see: http://github.com/dominikh/github-gem/commit/3756a55c840ddbaef60d596250372e51faf07afc
+# merged patches: 
+# http://github.com/dominikh/github-gem/commit/3756a55c840ddbaef60d596250372e51faf07afc
+# http://github.com/snowblink/github-gem/commit/3726b5e0f1f1129e41550f753e1d2207a3f5063c
+
 helper :user_and_repo_from do |url|
   case url
   # when %r|^git://github\.com/([^/]+/[^/]+)$|: $1.split('/')
@@ -256,7 +259,7 @@ helper :network_page_for do |user|
 end
 
 helper :network_meta_for do |user|
-  "http://github.com/#{user}/#{project}/network_meta"
+  "https://github.com/#{user}/#{project}/network_meta"  
 end
 
 helper :issues_page_for do |user|
@@ -341,8 +344,9 @@ helper :get_network_data do |user, options|
   if cache_network_data(options)
     begin
       return cache_data(user)
-    rescue SocketError
+    rescue Exception => e    
       STDERR.puts "*** Warning: There was a problem accessing the network."
+      STDERR.puts e      
       rv = get_cache
       STDERR.puts "Using cached data."
       rv
@@ -370,6 +374,14 @@ helper :cache_network_data do |options|
   cache_expired? || options[:nocache] || !has_cache?
 end
 
+helper :github_user do
+  `git config --get github.user`.chomp
+end
+
+helper :github_token do
+  `git config --get github.token`.chomp
+end
+
 helper :network_cache_path do
   dir = `git rev-parse --git-dir`.chomp
   File.join(dir, 'network-cache')
@@ -381,12 +393,8 @@ helper :commits_cache_path do
 end
 
 helper :cache_data do |user|
-  raw_data = Kernel.open(network_meta_for(user)).read
-  File.open( network_cache_path, 'w' ) do |out|
-    out.write(raw_data)
-  end             
-  puts "raw data for json parse: #{raw_data}"
-  data = JSON.parse(raw_data)
+  `curl -L -F 'login=#{github_user}' -F 'token=#{github_token}' #{network_meta_for(user)} -o #{network_cache_path}`
+  get_cache  
 end
 
 helper :cache_expired? do
@@ -405,9 +413,9 @@ helper :has_commits_cache? do
 end
 
 helper :get_cache do
-  data = File.read(network_cache_path)
-  puts "cached data for json parse: #{data}"  
-  JSON.parse(data)
+  raw_data = File.read(network_cache_path)
+  raw_data = "" if !raw_data
+  data = JSON.parse(raw_data)
 end
 
 helper :print_issues_help do
