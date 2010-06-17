@@ -3,7 +3,7 @@ module GitHub
     attr_accessor :options
   
     def initilialize(options = {})
-      @options = options
+      @options = options || {}
     end
   
     def commit_line sha, ref_name, commit
