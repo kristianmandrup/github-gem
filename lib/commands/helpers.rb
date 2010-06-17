@@ -336,7 +336,7 @@ helper :network_members do |user, options|
   data = get_network_data(user, options)
   if !data
     STDERR.puts "*** Warning: There was a problem accessing the network members data for user: #{user.inspect} with options: #{options.inspect}."
-    return ""
+    return []
   end
   data['users'].map { |u| u['name'] }
 end
