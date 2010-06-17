@@ -40,7 +40,7 @@ module GitHub
   
     def commit_line sha, ref_name, commit
       {
-        :sha => sha,
+        :sha => sha[0,6],
         :branch => ref_name,
         :email => commit[1],
         :message => commit[2],
