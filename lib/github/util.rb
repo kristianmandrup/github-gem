@@ -32,7 +32,7 @@ module GitHub
       ml_hash = max_length_hash.merge(custom_max_length_hash)
       max_hash.each_key do |k|
         line_part = line[k]
-        line_part = truncate(line_part, :length => ml_hash[k])
+        line_part = truncate(line_part, :length => ml_hash[k]) if ml_hash[k]
         trunced_line_parts[k] = line_part.ljust(max_hash[k])
       end
       trunced_line_parts

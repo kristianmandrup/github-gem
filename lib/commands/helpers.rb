@@ -166,10 +166,10 @@ helper :print_commits do |our_commits, options|
       else
         common = options[:common] ? get_common(sha) : ''
         lines << util.commit_line(sha, ref_name, commit)
-      end                                                            
-    end                                                              
-    shown_commits[sha] = true                                        
-  end                                                                
+      end
+    end
+    shown_commits[sha] = true
+  end
   
   # print lines
   out = []
