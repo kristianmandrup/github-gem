@@ -23,15 +23,16 @@ module GitHub
     end
     
     def max_length_hash
-      @max_length_hash ||= options[:short] ? short_max_length_hash : default_max_length_hash
+      options[:short] ? short_max_length_hash : default_max_length_hash
     end
 
     def line_parts(lines, line, custom_max_length_hash = {})
       max_hash = maxes(lines)
       trunced_line_parts = {}
+      ml_hash = max_length_hash.merge(custom_max_length_hash)
       max_hash.each_key do |k|
         line_part = line[k]
-        line_part = truncate(line_part, :length => max_length_hash.merge(custom_max_length_hash))
+        line_part = truncate(line_part, :length => ml_hash[k])
         trunced_line_parts[k] = line_part.ljust(max_hash[k])
       end
       trunced_line_parts
