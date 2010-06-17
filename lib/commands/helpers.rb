@@ -385,7 +385,7 @@ helper :cache_data do |user|
   File.open( network_cache_path, 'w' ) do |out|
     out.write(raw_data)
   end             
-  puts "raw_data for json parse: #{raw_data}"
+  puts "raw data for json parse: #{raw_data}"
   data = JSON.parse(raw_data)
 end
 
@@ -405,7 +405,9 @@ helper :has_commits_cache? do
 end
 
 helper :get_cache do
-  JSON.parse(File.read(network_cache_path))
+  data = File.read(network_cache_path)
+  puts "cached data for json parse: #{data}"  
+  JSON.parse(data)
 end
 
 helper :print_issues_help do
