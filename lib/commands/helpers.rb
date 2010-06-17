@@ -193,7 +193,7 @@ helper :commit_line do |sha, ref_name, commit|
 end
 
 helper :commit_entry do |entry, opt|
-  entry = entry[0, length] if opt[:length]
+  entry = entry[0, opt[:length]] if opt[:length]
   entry = truncate(entry, :length => opt[:max_length]) if options[:short] && opt[:max_length]
   entry.ljust opt[:ljust] if opt[:ljust]
 end
