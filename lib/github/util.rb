@@ -12,7 +12,7 @@ module GitHub
         :branch => commit_entry(ref_name, :ljust => 25), 
         :email => commit_entry(commit[1], :length => 30, :ljust => 31, :max_length => 21),
         :message => commit_entry(commit[2], :length => 50, :ljust => 52, :max_length => 30),
-        :time_ago => commit_entry(commit[3], :length => 25, :short => 15, )
+        :time_ago => commit_entry(commit[3], :length => 25, :max_length => 15)
       }
     end
 
