@@ -163,7 +163,7 @@ helper :print_commits do |our_commits, options|
         puts sha
       else
         common = options[:common] ? get_common(sha) : ''
-        line = commit_line(sha, ref_name)
+        line = commit_line(sha, ref_name, commit)
         puts "#{line[:sha]} #{line[:branch]} #{line[:email]} #{line[:message]} #{line[:time_ago]}"
       end
     end
@@ -171,7 +171,7 @@ helper :print_commits do |our_commits, options|
   end
 end
 
-helper :commit_line do |sha, ref_name|
+helper :commit_line do |sha, ref_name, commit|
   {:sha => sha[0,6], :branch => ref_name.ljust(25), :email => commit[1][0,20].ljust(21), :message => commit[2][0, 36].ljust(38), :time_ago => commit[3][0,15]}
 end
 
