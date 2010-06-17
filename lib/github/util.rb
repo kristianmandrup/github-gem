@@ -27,7 +27,7 @@ module GitHub
     end
 
     def line_parts(lines, line, custom_max_length_hash = {})
-      max_hash = util.maxes(lines)
+      max_hash = maxes(lines)
       trunced_line_parts = {}
       max_hash.each_key do |k|
         line_part = line[k]
