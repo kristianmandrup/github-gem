@@ -101,17 +101,20 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<text-format>, [">= 1.0.0"])
       s.add_runtime_dependency(%q<highline>, ["~> 1.5.1"])
       s.add_runtime_dependency(%q<json>, [">= 1.2.0"])
+      s.add_runtime_dependency(%q<faster_xml_simple>, [">= 0.5.0"])
     else
       s.add_dependency(%q<rspec>, [">= 1.2.9"])
       s.add_dependency(%q<text-format>, [">= 1.0.0"])
       s.add_dependency(%q<highline>, ["~> 1.5.1"])
       s.add_dependency(%q<json>, [">= 1.2.0"])
+      s.add_dependency(%q<faster_xml_simple>, [">= 0.5.0"])
     end
   else
     s.add_dependency(%q<rspec>, [">= 1.2.9"])
     s.add_dependency(%q<text-format>, [">= 1.0.0"])
     s.add_dependency(%q<highline>, ["~> 1.5.1"])
     s.add_dependency(%q<json>, [">= 1.2.0"])
+    s.add_dependency(%q<faster_xml_simple>, [">= 0.5.0"])
   end
 end
 
