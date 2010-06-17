@@ -57,8 +57,9 @@ usage "github track remote [user]"
 usage "github track remote [user/repo]"
 usage "github track [user]"
 usage "github track [user/repo]"
-flags :private => "Use git@github.com: instead of git://github.com/."
+flags :private => 'Use git@github.com: instead of git://github.com/.'
 flags :ssh => 'Equivalent to --private'
+flags :mainline => 'Mark this user as mainline. Used for github review.'
 command :track do |remote, user|
   # track remote user
   # track remote user/repo
@@ -67,22 +68,169 @@ command :track do |remote, user|
   user, remote = remote, nil if user.nil?
   die "Specify a user to track" if user.nil?
   user, repo = user.split("/", 2)
-  die "Already tracking #{user}" if helper.tracking?(user)
+
+  remote ||= user
+  if helper.tracking?(user)
+    if options[:mainline]
+      puts "Setting mainline repo to #{remote}"
+      helper.mainline_repo(remote)
+      return;
+    end
+    die "Already tracking #{user}"
+  end
   repo = @helper.project if repo.nil?
   repo.chomp!(".git")
-  remote ||= user
 
   if options[:private] || options[:ssh]
     git "remote add #{remote} #{helper.private_url_for_user_and_repo(user, repo)}"
   else
     git "remote add #{remote} #{helper.public_url_for_user_and_repo(user, repo)}"
   end
+  if options[:mainline]
+    helper.mainline_repo(remote)
+  end
 end
 
 desc "Fetch all refs from a user"
 command :fetch_all do |user|
   GitHub.invoke(:track, user) unless helper.tracking?(user)
-  git "fetch #{user}"
+  puts git("fetch #{user}")
+end
+
+desc "Get/set the mainline repo"
+command :mainline do |remote|
+    if remote.nil?
+        puts helper.mainline_repo
+    else
+        puts "Setting new mainline as #{remote}"
+        helper.mainline_repo(remote)
+    end
+end
+
+desc "Review another users branch before merging"
+command :review do |user, branch|
+  original_branch = helper.current_branch
+  user, branch = branch, nil if user.nil?
+  die "Specify a user to review" if user.nil?
+  user, branch = user.split("/", 2) if branch.nil?
+  GitHub.invoke(:fetch_all, user)
+
+  mainline = helper.mainline_repo
+  GitHub.invoke(:fetch_all, mainline);
+
+  if git_ret("checkout -b review##{user}/#{branch} #{mainline}/master") != 0
+      die "Couldn't checkout #{mainline}/master to review against."
+  end
+
+  merge_message = git("merge #{user}/#{branch}")
+  if merge_message == "Already up-to-date."
+    puts "Branch #{user}/#{branch} is already merged to #{mainline}/master."
+    puts "Nothing to do."
+  elsif merge_message =~ /^fatal: /
+    puts merge_message
+    puts "Nothing I can do."
+  else
+    return
+  end
+ 
+  # Cleanup if we're still here
+  git "checkout #{original_branch}"
+  git "branch -D review##{user}/#{branch}"
+end
+
+desc "Difference between mainline/master and local"
+command :'mainline-diff' do
+    mainline = helper.mainline_repo
+    git_exec("diff #{mainline}/master")
+end
+
+desc "Pass review by merging into origin/master"
+command :'review-pass' do
+  branch = helper.current_branch
+
+  branch =~ /^review#/ or
+    die "Must be in a review branch"
+  helper.branch_dirty? and
+    die "Cannot pass review, your current branch has uncommited changes"
+
+  mainline = helper.mainline_repo
+
+  # Should be ready.
+  puts "Pushing to #{mainline}"
+  puts git "push #{mainline} HEAD:master"
+  puts git "checkout master"
+  puts "Merged #{branch} to #{mainline}/master"
+end
+
+desc "Fail review by sending message"
+command :'review-fail' do
+  branch = helper.current_branch
+
+  branch =~ /^review#/ or
+    die "Must be in a review branch"
+  orig_branch = branch.sub(/^review#/, '')
+  user = branch.scan(/^review#(.*?)\//)
+
+  message_file = (git "rev-parse --git-dir") + "/GitHubFailPullRequestMessage"
+
+  File.open(message_file, 'w') do |aFile|
+    aFile.puts "# To: #{user}"
+    aFile.puts ""
+    aFile.puts "# Please enter the reason you are rejecting this pull-request " +
+               " Lines starting"
+    aFile.puts "# with '#' will be ignored, and an empty message aborts " +
+               "the commit."
+    aFile.puts "#"
+    aFile.puts "#"
+    aFile.puts "# --------"
+    aFile.puts "#"
+
+    gitcommits = git "log -u origin/master..#{branch}"
+    gitcommits.split(/\n/).each { |line|
+        aFile.puts "# #{line}"
+    }
+  end
+
+  system "#{editor} '#{message_file}'"
+  message_content = ""
+  File.open(message_file, 'r') do |aFile|
+    aFile.each { |line|
+      next if line =~ /^#/
+      message_content += line
+    }
+  end
+
+# Only comments or only our initial blank line are consitered abort-worthy
+  if not message_content.empty? and message_content != "\n"
+    sh 'curl', "-Flogin=#{github_user}", "-Ftoken=#{github_token}",
+      "-Fmessage[body]=#{message_content}", "-Fmessage[to]=#{user}",
+      "-Fmessage[subject]=Reject pull-request for #{orig_branch}",
+      "http://github.com/inbox"
+    puts "Sent github message to #{user}"
+    File.unlink(message_file)
+  else
+    puts "Aborted review-fail due to empty message."
+    return;
+  end
+
+  if git_ret('diff', '--quiet', orig_branch) != 0
+    puts "Preserving #{branch} as it has local changes. You can delete with: "
+    puts " git branch -D #{branch}"
+  else
+      git "checkout master"
+      git_exec "branch -D #{branch}"
+  end
+  
+end
+
+desc "Cancel a review"
+command :'review-cancel' do
+  branch = helper.current_branch
+
+  branch =~ /^review#/ or
+    die "Must be in a review branch"
+  git_ret("checkout master")
+  git_ret("branch -D #{branch}")
 end
 
 desc "Fetch from a remote to a local branch."
