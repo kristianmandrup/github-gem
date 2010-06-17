@@ -384,7 +384,8 @@ helper :cache_data do |user|
   raw_data = Kernel.open(network_meta_for(user)).read
   File.open( network_cache_path, 'w' ) do |out|
     out.write(raw_data)
-  end
+  end             
+  puts "raw_data for json parse: #{raw_data}"
   data = JSON.parse(raw_data)
 end
 
