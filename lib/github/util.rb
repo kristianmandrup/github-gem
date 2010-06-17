@@ -16,8 +16,8 @@ module GitHub
       }
     end
 
-    def truncate text, opt
-      opt = {:length => 30, :omission => "..."}.merge(opt || {})
+    def truncate(text, opt = {})
+      opt = {:length => 30, :omission => "..."}.merge(opt)
       if text
         l = opt[:length] - opt[:omission].length
         chars = text
@@ -27,9 +27,9 @@ module GitHub
       end
     end
 
-    def commit_entry entry, opt
+    def commit_entry(entry, opt = {})
       entry = entry[0, opt[:length]] if opt[:length]
-      entry = truncate(entry, :length => opt[:max_length]) if options[:short] && opt[:max_length]
+      entry = truncate(entry, :length => opt[:max_length]) if options && options[:short] && opt[:max_length]
       entry.ljust opt[:ljust] if opt[:ljust]
     end
   
