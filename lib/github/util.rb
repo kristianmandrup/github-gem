@@ -2,8 +2,8 @@ module GitHub
   class Util
     attr_accessor :options
   
-    def initilialize(options = {})
-      @options = options || {}
+    def initialize(opts = {})
+      @options = opts || {}
     end
   
     def commit_line sha, ref_name, commit
@@ -29,7 +29,7 @@ module GitHub
 
     def commit_entry(entry, opt = {})
       entry = entry[0, opt[:length]] if opt[:length]
-      entry = truncate(entry, :length => opt[:max_length]) if options && options[:short] && opt[:max_length]
+      entry = truncate(entry, :length => opt[:max_length]) if options[:short] && opt[:max_length]
       entry = entry.ljust opt[:ljust] if opt[:ljust]
       entry
     end
