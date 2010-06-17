@@ -3,6 +3,7 @@ require 'rubygems'
 require 'github/extensions'
 require 'github/command'
 require 'github/helper'
+require 'github/util'
 require 'github/ui'
 require 'fileutils'
 require "net/http"
