@@ -10,6 +10,7 @@ flags :nocache => "Do not use the cached network data"
 flags :cache => "Use the network data even if it's expired"
 flags :sort => "How to sort : date(*), branch, author"
 flags :common => "Show common branch point"
+flags :short => "To ensure commit lines are printed to fit approx 100 chars/line"
 flags :thisbranch => "Look at branches that match the current one"
 flags :limit => "Only look through the first X heads - useful for really large projects"
 command :network do |command, user|

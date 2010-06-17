@@ -164,15 +164,20 @@ helper :print_commits do |our_commits, options|
       else
         common = options[:common] ? get_common(sha) : ''
         line = commit_line(sha, ref_name, commit)
-        puts "#{line[:sha]} #{line[:branch]} #{line[:email]} #{line[:message]} #{line[:time_ago]}"
-      end
-    end
-    shown_commits[sha] = true
-  end
+        puts "#{line[:sha]} #{line[:branch]} #{truncate(line[:email], 21)} #{truncate(line[:message], 30)} #{truncate(line[:time_ago], 15)}" if options[:short]
+        puts "#{line[:sha]} #{line[:branch]} #{line[:email]} #{line[:message]} #{line[:time_ago]}" if !options[:short]        
+      end                                                            
+    end                                                              
+    shown_commits[sha] = true                                        
+  end                                                                
+end
+
+helper :truncate do |str, length|
+  str.gsub(/^(.{#{length}}[\w.]*)(.*)/m) {$2.empty? ? $1 : $1 + ‘…’}  
 end
 
 helper :commit_line do |sha, ref_name, commit|
-  {:sha => sha[0,6], :branch => ref_name.ljust(25), :email => commit[1][0,20].ljust(21), :message => commit[2][0, 36].ljust(38), :time_ago => commit[3][0,15]}
+  {:sha => sha[0,6], :branch => ref_name.ljust(25), :email => commit[1][0,30].ljust(31), :message => commit[2][0, 50].ljust(52), :time_ago => commit[3][0,25]}
 end
 
 helper :applies_cleanly do |sha|
