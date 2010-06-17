@@ -11,7 +11,7 @@ require 'open-uri'
 require 'json'
 require 'yaml'
 require 'text/format'
-require 'faster-xml-simple'
+require 'faster_xml_simple'
 require "time"
 require 'mime/types'
 ##
