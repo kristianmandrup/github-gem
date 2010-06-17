@@ -30,7 +30,8 @@ module GitHub
     def commit_entry(entry, opt = {})
       entry = entry[0, opt[:length]] if opt[:length]
       entry = truncate(entry, :length => opt[:max_length]) if options && options[:short] && opt[:max_length]
-      entry.ljust opt[:ljust] if opt[:ljust]
+      entry = entry.ljust opt[:ljust] if opt[:ljust]
+      entry
     end
   
   end
