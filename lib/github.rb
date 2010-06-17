@@ -170,11 +170,11 @@ GitHub.command :default, :aliases => ['', '-h', 'help', '-help', '--help'] do
     flongest = GitHub.flag_descriptions[command].map { |d,| "--#{d}".size }.max
     ffmt = fmt.clone
     ffmt.body_indent += 2 # length of "% " and/or "--"
-    GitHub.usage_descriptions[command].each do |usage_descriptions|
-      usage_descriptions.each do |usage|
+    GitHub.usage_descriptions[command].each do |usage| #|usage_descriptions|
+      #usage_descriptions.each do |usage|
         usage_str = "%% %-#{flongest}s" % usage
         message << ffmt.format(usage_str)
-      end
+      #end
     end
     GitHub.flag_descriptions[command].sort {|a,b| a.to_s <=> b.to_s }.each do |flag, fdesc|
       flagstr = "#{" " * longest}  %-#{flongest}s" % "--#{flag}"
