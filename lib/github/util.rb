@@ -5,14 +5,44 @@ module GitHub
     def initialize(opts = {})
       @options = opts || {}
     end
+
+    def maxes(lines)
+      max = {}            
+      lines[0].keys.each do |k|
+        max[k] = lines.sort_by {|line| line[k].size}.last[k].size
+      end 
+      max
+    end
+
+    def short_max_length_hash 
+      {:branch => 30, :email => 21, :message => 30, :time_ago => 15}                  
+    end
+    
+    def default_max_length_hash
+      {:branch => 40, :email => 40, :message => 50, :time_ago => 25}      
+    end
+    
+    def max_length_hash
+      @max_length_hash ||= options[:short] ? short_max_length_hash : default_max_length_hash
+    end
+
+    def line_parts(line, max_hash, custom_max_length_hash = {})
+      trunced_line_parts = {}
+      max_hash.each_key do |k|
+        line_part = line[k]
+        line_part = truncate(line_part, :length => max_length_hash.merge(custom_max_length_hash))
+        trunced_line_parts[k] = line_part.ljust(max_hash[k])
+      end
+      trunced_line_parts
+    end
   
     def commit_line sha, ref_name, commit
       {
-        :sha => commit_entry(sha, :length => 6), 
-        :branch => commit_entry(ref_name, :ljust => 25), 
-        :email => commit_entry(commit[1], :length => 30, :ljust => 31, :max_length => 21),
-        :message => commit_entry(commit[2], :length => 50, :ljust => 52, :max_length => 30),
-        :time_ago => commit_entry(commit[3], :length => 25, :max_length => 15)
+        :sha => sha,
+        :branch => ref_name,
+        :email => commit[1],
+        :message => commit[2],
+        :time_ago => commit[3],
       }
     end
 
@@ -25,13 +55,6 @@ module GitHub
       else
         ""
       end
-    end
-
-    def commit_entry(entry, opt = {})
-      entry = entry[0, opt[:length]] if opt[:length]
-      entry = truncate(entry, :length => opt[:max_length]) if options[:short] && opt[:max_length]
-      entry = entry.ljust opt[:ljust] if opt[:ljust]
-      entry
     end
   
   end

@@ -143,9 +143,11 @@ helper :print_commits do |our_commits, options|
     our_commits.sort! { |a, b| Date.parse(a[1][4]) <=> Date.parse(b[1][4]) } rescue 'cant parse dates'
   end
 
-  shown_commits = {}
+  shown_commits = {}                     
+  lines = []
   before = Date.parse(options[:before]) if options[:before] rescue puts 'cant parse before date'
   after = Date.parse(options[:after]) if options[:after] rescue puts 'cant parse after date'
+  util = Util.new(options)
   our_commits.each do |cherry, commit|
     status, sha, ref_name = cherry
     ref_name ||= ""
@@ -163,12 +165,21 @@ helper :print_commits do |our_commits, options|
         puts sha
       else
         common = options[:common] ? get_common(sha) : ''
-        line = Util.new(options).commit_line(sha, ref_name, commit)
-        puts "#{line[:sha]} #{line[:branch]} #{line[:email]} #{line[:message]} #{line[:time_ago]}"
+        lines << util.commit_line(sha, ref_name, commit)
       end                                                            
     end                                                              
     shown_commits[sha] = true                                        
   end                                                                
+  
+  # print lines
+  max_hash = util.maxes(lines)
+  out = []
+  lines.each do |line|    
+    parts = line_parts(line, max_hash)    
+    # :sha, :branch, :email, :message, :time_ago    
+    out << "#{parts[:sha]} #{parts[:branch]} #{parts[:email]} #{parts[:time_ago]}"  
+  end    
+  puts *out  
 end
 
 helper :applies_cleanly do |sha|
