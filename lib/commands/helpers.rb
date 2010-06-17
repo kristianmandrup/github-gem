@@ -171,7 +171,7 @@ helper :print_commits do |our_commits, options|
   end
 end
 
-def commit_line(sha, ref_name)
+helper :commit_line do |sha, ref_name|
   {:sha => sha[0,6], :branch => ref_name.ljust(25), :email => commit[1][0,20].ljust(21), :message => commit[2][0, 36].ljust(38), :time_ago => commit[3][0,15]}
 end
 
