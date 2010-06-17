@@ -164,23 +164,36 @@ helper :print_commits do |our_commits, options|
       else
         common = options[:common] ? get_common(sha) : ''
         line = commit_line(sha, ref_name, commit)
-        puts "#{line[:sha]} #{line[:branch]} #{truncate(line[:email], 21)} #{truncate(line[:message], 30)} #{truncate(line[:time_ago], 15)}" if options[:short]
-        puts "#{line[:sha]} #{line[:branch]} #{line[:email]} #{line[:message]} #{line[:time_ago]}" if !options[:short]        
+        puts "#{line[:sha]} #{line[:branch]} #{line[:email]} #{line[:message]} #{line[:time_ago]}"
       end                                                            
     end                                                              
     shown_commits[sha] = true                                        
   end                                                                
 end
 
-helper :truncate do |text, length|
-  end_string = ' …'
-  return "" if text == nil
-  words = text.split()
-  words[0..(length-1)].join(' ') + (words.length > length ? end_string : '')
+helper :truncate do |text, opt|
+  opt = {:length => 30, :omission => "..."}.merge(opt || {})
+  if text
+    l = opt[:length] - opt[:omission].length
+    chars = text
+    (chars.length > opt[:length] ? chars[0...l] + opt[:omission] : text).to_s
+  end
 end
 
 helper :commit_line do |sha, ref_name, commit|
-  {:sha => sha[0,6], :branch => ref_name.ljust(25), :email => commit[1][0,30].ljust(31), :message => commit[2][0, 50].ljust(52), :time_ago => commit[3][0,25]}
+  {
+    :sha => commit_entry(sha, :length => 6), 
+    :branch => commit_entry(ref_name, :ljust => 25), 
+    :email => commit_entry(commit[1], :length => 30, :ljust => 31, :max_length => 21),
+    :message => commit_entry(commit[2], :length => 50, :ljust => 52, :max_length => 30),
+    :time_ago => commit_entry(commit[3], :length => 25, :short => 15)
+  }
+end
+
+helper :commit_entry |entry, opt|
+  entry = entry[0, length] if opt[:length]
+  truncate(txt, :length => opt[:max_length]) if options[:short] && opt[:max_length]
+  txt.ljust opt[:ljust] if opt[:ljust]
 end
 
 helper :applies_cleanly do |sha|
