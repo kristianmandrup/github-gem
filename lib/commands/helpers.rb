@@ -413,9 +413,18 @@ helper :has_commits_cache? do
 end
 
 helper :get_cache do
-  raw_data = File.read(network_cache_path)
-  raw_data = "" if !raw_data
-  data = JSON.parse(raw_data)
+  begin
+    raw_data = File.read(network_cache_path)
+    if !raw_data || raw_data.empty?      
+      STDERR.puts "*** No network data found in cache at: #{network_cache_path}"
+      STDERR.puts e
+      exit -1
+    end
+    data = JSON.parse(raw_data)      
+  rescue Exception => e    
+    STDERR.puts "*** Warning: There was a problem reading the cached network data at: #{network_cache_path}."
+    STDERR.puts e      
+  end
 end
 
 helper :print_issues_help do
