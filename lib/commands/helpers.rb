@@ -163,7 +163,7 @@ helper :print_commits do |our_commits, options|
         puts sha
       else
         common = options[:common] ? get_common(sha) : ''
-        line = Github::Util.new(options).commit_line(sha, ref_name, commit)
+        line = Util.new(options).commit_line(sha, ref_name, commit)
         puts "#{line[:sha]} #{line[:branch]} #{line[:email]} #{line[:message]} #{line[:time_ago]}"
       end                                                            
     end                                                              

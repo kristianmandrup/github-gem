@@ -37,6 +37,7 @@ Gem::Specification.new do |s|
      "lib/github/extensions.rb",
      "lib/github/helper.rb",
      "lib/github/ui.rb",
+     "lib/github/util.rb",
      "setup.rb",
      "spec/command_spec.rb",
      "spec/commands/command_browse_spec.rb",
