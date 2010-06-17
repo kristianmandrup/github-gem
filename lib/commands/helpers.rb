@@ -172,7 +172,6 @@ helper :print_commits do |our_commits, options|
   end                                                                
   
   # print lines
-  max_hash = 
   out = []
   lines.each do |line|    
     parts = util.line_parts(lines, line)    
