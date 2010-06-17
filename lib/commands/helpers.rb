@@ -183,6 +183,12 @@ helper :remote_branch? do |user, branch|
   remote_branches_for(user).key?(branch)
 end
 
+helper :branch_dirty_from_remote? do
+    branch = current_branch
+    branch_dirty? ||
+      !system("git diff --quiet origin/#{branch} 2>#{DEV_NULL}")
+end
+
 # see if there are any cached or tracked files that have been modified
 # originally, we were going to use git-ls-files but that could only
 # report modified track files...not files that have been staged
@@ -398,7 +404,7 @@ helper :commits_cache_path do
 end
 
 helper :cache_data do |user|
-  `curl -L -F 'login=#{github_user}' -F 'token=#{github_token}' #{network_meta_for(user)} -o #{network_cache_path}`
+  `curl -L -F 'login=#{github_user}' -F 'token=#{github_token}' #{network_meta_for(user)} -o #{network_cache_path} -s`
   get_cache  
 end
 

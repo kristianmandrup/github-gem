@@ -67,12 +67,17 @@ module GitHub
       exit!
     end
 
+
     def github_user
-      git("config --get github.user")
+      user = git("config --get github.user")
+      raise "No user specified in github config" if user.empty?
+      return user
     end
 
     def github_token
-      git("config --get github.token")
+      token = git("config --get github.token")
+      raise "No token specified in github config" if token.empty?
+      return token
     end
 
     def github_post(url, hash={})
@@ -86,12 +91,24 @@ module GitHub
       s.respond_to?(:shellescape) ? s.shellescape : "'#{s}'"
     end
 
+    def editor
+        e = git "config core.editor"
+        e = ENV['GIT_EDITOR'] if not e or e.empty?
+        e = ENV['EDITOR'] if not e or e.empty?
+        e = 'vi' if not e or e.empty?
+        return e
+    end
+
     def shell_user
       ENV['USER']
     end
 
     def current_user?(user)
-      user == github_user || user == shell_user
+      begin
+        user == github_user || user == shell_user
+      rescue
+        user == shell_user
+      end
     end
 
     class Shell < String

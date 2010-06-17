@@ -14,7 +14,8 @@ begin
     gem.add_development_dependency "rspec", ">= 1.2.9"
     gem.add_dependency "text-format", ">=1.0.0"
     gem.add_dependency "highline", "~>1.5.1"
-    gem.add_dependency "json", ">=1.2.0"    
+    gem.add_dependency "json", ">=1.2.0" 
+    gem.add_dependency "faster-xml-simple", ">=0.6.4"    
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
