@@ -1,45 +1,49 @@
 require 'rubygems'
 require 'rake'
+require 'rspec'
 
 begin
-  require 'echoe'
-
-  Echoe.new('github', '0.4.4') do |p|
-    p.rubyforge_name = 'github'
-    p.summary      = "The official `github` command line helper for simplifying your GitHub experience."
-    p.description  = "The official `github` command line helper for simplifying your GitHub experience."
-    p.url          = "http://github.com/"
-    p.author       = ['Chris Wanstrath', 'Kevin Ballard', 'Scott Chacon', 'Dr Nic Williams']
-    p.email        = "drnicwilliams@gmail.com"
-    p.dependencies = [
-      "text-format >=1.0.0",
-      "highline ~>1.5.1",
-      "json >=1.2.0"
-    ]
+  require 'jeweler'
+  Jeweler::Tasks.new do |gem|
+    gem.name = "github"
+    gem.summary = %Q{The official `github` command line helper.}
+    gem.description = %Q{Simplifies your GitHub experience.}
+    gem.email = "kmandrup@gmail.com"
+    gem.homepage = "http://github.com/kristianmandrup/github"
+    gem.authors = ['Chris Wanstrath', 'Kevin Ballard', 'Scott Chacon', 'Dr Nic Williams', 'Kristian Mandrup']
+    gem.add_development_dependency "rspec", ">= 1.2.9"
+    gem.add_dependency "text-format", ">=1.0.0"
+    gem.add_dependency "highline", "~>1.5.1"
+    gem.add_dependency "json", ">=1.2.0"    
+    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
-
-rescue LoadError => boom
-  puts "You are missing a dependency required for meta-operations on this gem."
-  puts "#{boom.to_s.capitalize}."
+  Jeweler::GemcutterTasks.new
+rescue LoadError
+  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
 end
 
-# add spec tasks, if you have rspec installed
-begin
-  require 'spec/rake/spectask'
-
-  Spec::Rake::SpecTask.new("spec") do |t|
-    t.spec_files = FileList['spec/**/*_spec.rb']
-    t.spec_opts = ['--color']
-  end
-
-  task :test do
-    Rake::Task['spec'].invoke
-  end
-
-  Spec::Rake::SpecTask.new("rcov_spec") do |t|
-    t.spec_files = FileList['spec/**/*_spec.rb']
-    t.spec_opts = ['--color']
-    t.rcov = true
-    t.rcov_opts = ['--exclude', '^spec,/gems/']
-  end
-end
+# Uncomment if you are using rspec < 2
+# Spec::Rake::SpecTask.new(:spec) do |spec|
+#   spec.libs << 'lib' << 'spec'
+#   spec.spec_files = FileList['spec/**/*_spec.rb']
+# end
+# 
+# Spec::Rake::SpecTask.new(:rcov) do |spec|
+#   spec.libs << 'lib' << 'spec'
+#   spec.pattern = 'spec/**/*_spec.rb'
+#   spec.rcov = true
+# end
+# 
+# task :spec => :check_dependencies
+# 
+# task :default => :spec
+# 
+# require 'rake/rdoctask'
+# Rake::RDocTask.new do |rdoc|
+#   version = File.exist?('VERSION') ? File.read('VERSION') : ""
+# 
+#   rdoc.rdoc_dir = 'rdoc'
+#   rdoc.title = "github #{version}"
+#   rdoc.rdoc_files.include('README*')
+#   rdoc.rdoc_files.include('lib/**/*.rb')
+# end

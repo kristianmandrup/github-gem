@@ -1,3 +1,8 @@
+== 0.4.5 2010-17-06
+
+Converted project to a jewel (for use with jeweler)
+Plan to merge patches from other branches
+
 == 0.4.4 2010-06-05
 
 Fixed creation of public repositories
