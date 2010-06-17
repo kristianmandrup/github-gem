@@ -172,12 +172,12 @@ helper :print_commits do |our_commits, options|
   end                                                                
   
   # print lines
-  max_hash = util.maxes(lines)
+  max_hash = 
   out = []
   lines.each do |line|    
-    parts = line_parts(line, max_hash)    
+    parts = util.line_parts(lines, line)    
     # :sha, :branch, :email, :message, :time_ago    
-    out << "#{parts[:sha]} #{parts[:branch]} #{parts[:email]} #{parts[:time_ago]}"  
+    out << "#{parts[:sha]} #{parts[:branch]} #{parts[:email]} #{parts[:message]} #{parts[:time_ago]}"  
   end    
   puts *out  
 end

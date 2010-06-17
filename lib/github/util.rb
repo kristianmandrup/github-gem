@@ -26,7 +26,8 @@ module GitHub
       @max_length_hash ||= options[:short] ? short_max_length_hash : default_max_length_hash
     end
 
-    def line_parts(line, max_hash, custom_max_length_hash = {})
+    def line_parts(lines, line, custom_max_length_hash = {})
+      max_hash = util.maxes(lines)
       trunced_line_parts = {}
       max_hash.each_key do |k|
         line_part = line[k]
