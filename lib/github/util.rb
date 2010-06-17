@@ -6,7 +6,7 @@ module GitHub
       @options = options
     end
   
-    def commit_line sha, ref_name, commit, options
+    def commit_line sha, ref_name, commit
       {
         :sha => commit_entry(sha, :length => 6), 
         :branch => commit_entry(ref_name, :ljust => 25), 
