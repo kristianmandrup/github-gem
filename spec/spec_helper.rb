@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'spec'
-require 'active_record'
+require 'active_support'
 
 require File.expand_path(File.dirname(__FILE__) + '/../lib/github')
 
@@ -139,7 +139,7 @@ module SetupMethods
   def setup_user_and_branch(user = :user, branch = :master)
     @helper.should_receive(:user_and_branch).any_number_of_times.and_return([user, branch])
   end
-  
+
   def setup_github_token(user = 'drnic', token = 'MY_GITHUB_TOKEN')
     @command.should_receive(:github_user).any_number_of_times.and_return(user)
     @command.should_receive(:github_token).any_number_of_times.and_return(token)
