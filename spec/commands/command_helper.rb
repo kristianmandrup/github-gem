@@ -149,7 +149,7 @@ module CommandHelper
           @calls = []
         end
 
-        undef_method *(instance_methods.map { |x| x.to_sym } - [:__id__, :__send__])
+        undef_method *(instance_methods.map { |x| x.to_sym } - [:__id__, :__send__, :object_id])
 
         def invoke
           @calls.each do |sym, args|
