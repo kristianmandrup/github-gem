@@ -3,11 +3,11 @@ require File.expand_path(File.join(File.dirname(__FILE__), '/command_helper'))
 
 describe "github config" do
   include CommandHelper
-  
+
   specify "config takes [user token] if provided" do
     running :config, "drnic", "TOKEN" do
-      @command.should_receive(:git, "--global github.user drnic")
-      @command.should_receive(:git, "--global github.token TOKEN")
+      @command.should_receive(:git).with("config --global github.user drnic")
+      @command.should_receive(:git).with("config --global github.token TOKEN")
       stdout.should == "Configured with github.user drnic\n"
     end
   end
@@ -22,5 +22,5 @@ describe "github config" do
 #      @command.should_receive(:config)
 #    end
 #  end
-  
+
 end
