@@ -18,8 +18,8 @@ describe "github fork" do
       setup_url_for "origin", "defunkt", "github-gem"
       setup_remote "origin", :user => "defunkt", :project => "github-gem"
       setup_user_and_branch
-      @command.should_receive(:sh).with("curl -F login\\=drnic -F token\\=MY_GITHUB_TOKEN http://github.com/defunkt/github-gem/fork")
-      @command.should_receive(:git, "config remote.origin.url git@github.com/drnic/github-gem.git")
+      @command.should_receive(:sh).with("curl -F 'login=drnic' -F 'token=MY_GITHUB_TOKEN' http://github.com/defunkt/github-gem/fork")
+      @command.should_receive(:git).with("config remote.origin.url git@github.com:drnic/github-gem.git")
       stdout.should == "defunkt/github-gem forked\n"
     end
   end
@@ -27,8 +27,8 @@ describe "github fork" do
   specify "fork a user/project repo" do
     running :fork, "defunkt/github-gem" do
       setup_github_token
-      @command.should_receive(:sh).with("curl -F login\\=drnic -F token\\=MY_GITHUB_TOKEN http://github.com/defunkt/github-gem/fork")
-      @command.should_receive(:git_exec, "clone git://github.com/defunkt/github-gem.git")
+      @command.should_receive(:sh).with("curl -F 'login=drnic' -F 'token=MY_GITHUB_TOKEN' http://github.com/defunkt/github-gem/fork")
+      @command.should_receive(:git_exec).with("clone git@github.com:drnic/github-gem.git")
       stdout.should == "Giving GitHub a moment to create the fork...\n"
     end
   end
@@ -36,10 +36,9 @@ describe "github fork" do
   specify "fork a user project repo" do
     running :fork, "defunkt", "github-gem" do
       setup_github_token
-      @command.should_receive("sh").with("curl -F login\\=drnic -F token\\=MY_GITHUB_TOKEN http://github.com/defunkt/github-gem/fork")
-      @command.should_receive(:git_exec, "clone git://github.com/defunkt/github-gem.git")
+      @command.should_receive("sh").with("curl -F 'login=drnic' -F 'token=MY_GITHUB_TOKEN' http://github.com/defunkt/github-gem/fork")
+      @command.should_receive(:git_exec).with("clone git@github.com:drnic/github-gem.git")
       stdout.should == "Giving GitHub a moment to create the fork...\n"
     end
   end
-  
 end
