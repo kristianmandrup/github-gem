@@ -2,7 +2,7 @@ require 'rubygems'
 require 'spec'
 require 'active_record'
 
-require File.dirname(__FILE__) + '/../lib/github'
+require File.expand_path(File.dirname(__FILE__) + '/../lib/github')
 
 class Module
   def metaclass
