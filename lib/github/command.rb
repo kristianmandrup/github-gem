@@ -128,8 +128,8 @@ module GitHub
           err = perr.read.strip
         end
 
-        replace @error = err if err.any?
-        replace @out = out if out.any?
+        replace @error = err unless err.empty?
+        replace @out = out unless out.empty?
 
         self
       end
@@ -158,3 +158,4 @@ module GitHub
     end
   end
 end
+

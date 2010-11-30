@@ -1,3 +1,20 @@
+== 0.4.6 2010-30-11
+Fixed Shell bug using fork from 'bronson'
+  replace @error = err if err.any?
+  replace @out = out if err.any?
+
+Refactored into:
+  replace @error = err unless err.empty?
+  replace @out = out unless out.empty?
+
+Also added String extension just in case bug is elsewhere...
+
+class String 
+  def any?
+    !empty?
+  end
+end
+
 == 0.4.5 2010-17-06
 
 Converted project to a jewel (for use with jeweler)

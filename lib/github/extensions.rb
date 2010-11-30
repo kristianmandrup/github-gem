@@ -5,6 +5,12 @@ class Object
   end
 end
 
+class String 
+  def any?
+    !empty?
+  end
+end
+
 class NilClass
   klass = Class.new
   klass.class_eval do
