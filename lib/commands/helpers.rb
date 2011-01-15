@@ -3,7 +3,7 @@ DEV_NULL = File.exist?("/dev/null") ? "/dev/null" : "nul:" unless const_defined?
 helper :user_and_repo_from do |url|
   case url
   when %r|^git://github\.com/([^/]+/[^/]+)$| then $1.split('/')
-  when %r|^http://github\.com/([^/]+/[^/]+)$| then $1.split('/')
+  when %r|^https?://github\.com/([^/]+/[^/]+)$| then $1.split('/')
   when %r|^(?:git\+ssh://)?(?:git@)?github\.com/([^/]+/[^/]+)$| then $1.split('/')
   when %r|^(?:ssh://)?(?:git@)?github\.com:([^/]+/[^/]+)$| then $1.split('/')
   end
@@ -29,7 +29,7 @@ end
 
 helper :project do
   repo = repo_for(origin)
-  if repo.nil?
+  if repo.nil? || repo.empty?
     if url_for(origin) == ""
       STDERR.puts "Error: missing remote 'origin'"
     else
@@ -249,7 +249,7 @@ helper :network_page_for do |user|
 end
 
 helper :network_meta_for do |user|
-  "http://github.com/#{user}/#{project}/network_meta"
+  "https://github.com/#{user}/#{project}/network_meta"
 end
 
 helper :issues_page_for do |user|
@@ -257,7 +257,7 @@ helper :issues_page_for do |user|
 end
 
 helper :list_issues_for do |user, state|
-  "http://github.com/api/v2/yaml/issues/list/#{user}/#{project}/#{state}"
+  "https://github.com/api/v2/yaml/issues/list/#{user}/#{project}/#{state}"
 end
 
 helper :has_launchy? do |blk|

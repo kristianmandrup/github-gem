@@ -68,11 +68,21 @@ module GitHub
     end
 
     def github_user
-      git("config --get github.user")
+      user = git("config --get github.user")
+      if user.empty?
+        die("You must 'git config --global github.user [your Github username]' before running this command")
+      end
+
+      user
     end
 
     def github_token
-      git("config --get github.token")
+      token = git("config --get github.token")
+      if token.empty?
+        die("You must 'git config --global github.token [your API token]' before running this command")
+      end
+
+      token
     end
 
     def github_post(url, hash={})

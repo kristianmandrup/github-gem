@@ -1,6 +1,6 @@
-require 'rubygems'
+require 'bundler/setup'
 require 'spec'
-require 'active_support'
+require 'active_record'
 
 require File.expand_path(File.dirname(__FILE__) + '/../lib/github')
 

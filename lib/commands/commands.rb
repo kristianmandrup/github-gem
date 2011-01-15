@@ -7,6 +7,16 @@ command :home do |user|
   end
 end
 
+desc "Open this repo's Admin panel a web browser."
+command :admin do |user|
+  if helper.project
+    homepage = helper.homepage_for(user || helper.owner, 'master')
+    homepage.gsub!(%r{/tree/master$}, '')
+    homepage += "/admin"
+    helper.open homepage
+  end
+end
+
 desc "Automatically set configuration info, or pass args to specify."
 usage "github config [my_username] [my_token]"
 command :config do |user, token|
@@ -39,7 +49,7 @@ end
 desc 'Open the given user/project in a web browser'
 usage 'github open [user/project]'
 command :open do |arg|
-  helper.open "http://github.com/#{arg}"
+  helper.open "https://github.com/#{arg}"
 end
 
 desc "Info about this project."
@@ -47,7 +57,7 @@ command :info do
   puts "== Info for #{helper.project}"
   puts "You are #{helper.owner}"
   puts "Currently tracking:"
-  helper.tracking.sort { |a,b| a == helper.origin ? -1 : b == helper.origin ? 1 : a.to_s <=> b.to_s }.each do |(name,user_or_url)|
+  helper.tracking.sort { |a, b| a == helper.origin ? -1 : b == helper.origin ? 1 : a.to_s <=> b.to_s }.each do |(name,user_or_url)|
     puts " - #{user_or_url} (as #{name})"
   end
 end
@@ -135,7 +145,7 @@ command :clone do |user, repo, dir|
   die "Specify a user to pull from" if user.nil?
   if options[:search]
     query = [user, repo, dir].compact.join(" ")
-    data = JSON.parse(open("http://github.com/api/v1/json/search/#{URI.escape query}").read)
+    data = JSON.parse(open("https://github.com/api/v1/json/search/#{URI.escape query}").read)
     if (repos = data['repositories']) && !repos.nil? && repos.length > 0
       repo_list = repos.map do |r|
         { "name" => "#{r['username']}/#{r['name']}", "description" => r['description'] }
@@ -186,8 +196,7 @@ flags :rdoc => 'Create README.rdoc'
 flags :rst => 'Create README.rst'
 flags :private => 'Create private repository'
 command :create do |repo|
-  public_repo = options[:private].nil?
-  github_post "http://github.com/repositories", "repository[name]" => repo, "repository[public]" => public_repo
+  sh "curl -F 'repository[name]=#{repo}' -F 'repository[public]=#{!options[:private]}' -F 'login=#{github_user}' -F 'token=#{github_token}' https://github.com/repositories"
   mkdir repo
   cd repo
   git "init"
@@ -217,7 +226,7 @@ command :fork do |user, repo|
     end
   end
 
-  github_post "http://github.com/#{user}/#{repo}/fork"
+  sh "curl -F 'login=#{github_user}' -F 'token=#{github_token}' https://github.com/#{user}/#{repo}/fork"
 
   url = "git@github.com:#{github_user}/#{repo}.git"
   if is_repo
@@ -234,20 +243,24 @@ desc "Create a new GitHub repository from the current local repository"
 flags :private => 'Create private repository'
 command :'create-from-local' do
   cwd = sh "pwd"
-  repo = File.basename(cwd, ".git")
+  repo = File.basename(cwd)
   is_repo = !git("status").match(/fatal/)
   raise "Not a git repository. Use gh create instead" unless is_repo
-  public_repo = options[:private].nil?
-  github_post "http://github.com/repositories", "repository[name]" => repo, "repository[public]" => public_repo
-  git "remote add origin git@github.com:#{github_user}/#{repo}.git"
-  git_exec "push origin master"
+  created = sh "curl -F 'repository[name]=#{repo}' -F 'repository[public]=#{options[:private] != true}' -F 'login=#{github_user}' -F 'token=#{github_token}' https://github.com/repositories"
+  if created.out =~ %r{You are being <a href="https://github.com/#{github_user}/([^"]+)"}
+    git "remote add origin git@github.com:#{github_user}/#{$1}.git"
+    git_exec "push origin master"
+  else
+    #TODO try to explain why it failed
+    die "error creating repository"
+  end
 end
 
 desc "Search GitHub for the given repository name."
 usage "github search [query]"
 command :search do |query|
   die "Usage: github search [query]" if query.nil?
-  data = JSON.parse(open("http://github.com/api/v1/json/search/#{URI.escape query}").read)
+  data = JSON.parse(open("https://github.com/api/v1/json/search/#{URI.escape query}").read)
   if (repos = data['repositories']) && !repos.nil? && repos.length > 0
     puts repos.map { |r| "#{r['username']}/#{r['name']}"}.sort.uniq
   else
